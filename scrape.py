@@ -26,10 +26,10 @@ def get_publication_links(url):
     for link in soup.select("a[href$='.html']"):
         link_to_check = str(link['href'])
         if "publication" in link_to_check and "publications.html" not in link_to_check:
-            if "/publication/" in link_to_check:
+            if "/publication/" in link_to_check and link_to_check not in publication_links:
                 publication_links.append(link_to_check)
                 logger.info(f"Found publication link: {link_to_check}")
-            elif link_to_check not in explored_links and link_to_check not in url and link_to_check not in unexplored_links:
+            elif link_to_check not in explored_links and link_to_check not in unexplored_links and link_to_check not in url :
                 logger.info(f"Found new publication page: {link_to_check}")
                 unexplored_links.append(link_to_check)
 
@@ -38,6 +38,7 @@ def get_publication_links(url):
 
 with open('publication_links.csv', 'w') as f:
     publications = get_publication_links(url)
+    logger.info(f"Found {len(publications)} publications.")
     f.writelines("\n".join(publications))
 
     if sorted(set(publications)) != sorted(publications):
@@ -47,7 +48,8 @@ with open('publication_links.csv', 'w') as f:
         next_link = unexplored_links.pop(0)
         explored_links.append(next_link)
         publications = get_publication_links(urljoin(url, next_link))
-        f.writelines("\n".join(publications))
+        logger.info(f"Found {len(publications)} publications.")
+    f.writelines("\n".join(publications))
 
 if sorted(set(publications)) != sorted(publications):
     print(f"{len(publications) - len(set(publications))} duplicate publications found.")
