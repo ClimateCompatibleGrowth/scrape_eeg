@@ -37,7 +37,8 @@ with open('publication_links.csv', 'r') as f:
             authors = soup.find("div", {"class": "views-field-field-author"})
             publication_date = soup.find("div", {"class": "views-field-field-publication-date"})
             title = soup.find('div', {'class': 'field--name-node-title'})
-            abstract = soup.find('div', {'class': 'field--type-text-with-summary'})
+            abstract = soup.find('div', {'class': 'field--type-text-with-summary'}).findAll('p')
+
 
             metadata.append({
                 "filename": filename,
@@ -46,7 +47,7 @@ with open('publication_links.csv', 'r') as f:
                 "publication_date": publication_date.find("time").text if publication_date else None,
                 "parent_url": urljoin(url, publication),
                 'title': title.find('h2').text.strip() if title else None,
-                'abstract': abstract.find('p').text.strip() if abstract else None
+                'abstract': " ".join([a.text for a in abstract]) if abstract else None
                 })
 
             with open(filename, 'wb') as f:
